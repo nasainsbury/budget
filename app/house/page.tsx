@@ -380,7 +380,10 @@ export default function House() {
           </thead>
           <tbody className="divide-y divide-gray-200 bg-white">
             {results.map((result) => (
-              <tr className="even:bg-gray-100 hover:bg-yellow-100">
+              <tr
+                className="even:bg-gray-100 hover:bg-yellow-100"
+                key={result.year}
+              >
                 <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
                   {result.year}
                 </td>
