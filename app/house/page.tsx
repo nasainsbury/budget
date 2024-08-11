@@ -2,27 +2,50 @@
 
 import { HouseConfig } from "../types";
 import { generateHouseBudget } from "../utils/generateHouseBudget";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 function formatValue(value: number) {
   return `£${Math.round(value).toLocaleString()}`;
 }
 
+const defaultSettings = {
+  houseDepositPercentage: 5,
+  housePrice: 250000,
+  startingBalance: 25000,
+  houseValueAppreciate: 2,
+  mortgageRate: 5.5,
+  mortgageTerm: 25,
+  salary: 3100,
+  salaryIncrease: 3,
+  savingsInterest: 9,
+  savingsPercent: 20,
+  inflation: 2,
+};
+
+function getSettings() {
+  const localStorageSettings = localStorage.getItem("settings");
+
+  const settings = localStorageSettings
+    ? JSON.parse(localStorageSettings)
+    : defaultSettings;
+
+  return settings;
+}
+
 export default function House() {
-  const [settings, setSettings] = useState<HouseConfig>({
-    houseDepositPercentage: 5,
-    housePrice: 250000,
-    startingBalance: 25000,
-    houseValueAppreciate: 2,
-    mortgageRate: 5.5,
-    mortgageTerm: 25,
-    salary: 3100,
-    salaryIncrease: 3,
-    savingsInterest: 9,
-    savingsPercent: 20,
-    inflation: 2,
-  });
+  const [settings, setSettings] = useState<HouseConfig>(getSettings());
+
   const results = generateHouseBudget(settings);
+
+  const setValue = useCallback((field: string, value: number) => {
+    const state = {
+      ...settings,
+      [field]: value,
+    };
+
+    setSettings(state);
+    localStorage.setItem("settings", JSON.stringify(state));
+  }, []);
 
   return (
     <main className="px-16 pt-8 flex gap-x-12 justify-between">
@@ -45,12 +68,7 @@ export default function House() {
                 name="salary"
                 type="number"
                 value={settings.salary}
-                onChange={(e) =>
-                  setSettings((prev) => ({
-                    ...prev,
-                    salary: e.target.valueAsNumber,
-                  }))
-                }
+                onChange={(e) => setValue("salary", e.target.valueAsNumber)}
                 placeholder="10000"
                 className="block w-full min-w-0 flex-1 rounded-none rounded-r-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               />
@@ -70,10 +88,7 @@ export default function House() {
                 type="number"
                 value={settings.salaryIncrease}
                 onChange={(e) =>
-                  setSettings((prev) => ({
-                    ...prev,
-                    salaryIncrease: e.target.valueAsNumber,
-                  }))
+                  setValue("salaryIncrease", e.target.valueAsNumber)
                 }
                 placeholder="5"
                 className="block w-full min-w-0 flex-1 rounded-none rounded-l-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -103,10 +118,7 @@ export default function House() {
                 type="number"
                 value={settings.startingBalance}
                 onChange={(e) =>
-                  setSettings((prev) => ({
-                    ...prev,
-                    startingBalance: e.target.valueAsNumber,
-                  }))
+                  setValue("startingBalance", e.target.valueAsNumber)
                 }
                 placeholder="10000"
                 className="block w-full min-w-0 flex-1 rounded-none rounded-r-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -127,10 +139,7 @@ export default function House() {
                 type="number"
                 value={settings.savingsInterest}
                 onChange={(e) =>
-                  setSettings((prev) => ({
-                    ...prev,
-                    savingsInterest: e.target.valueAsNumber,
-                  }))
+                  setValue("savingsInterest", e.target.valueAsNumber)
                 }
                 placeholder="5"
                 className="block w-full min-w-0 flex-1 rounded-none rounded-l-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -154,10 +163,7 @@ export default function House() {
                 type="number"
                 value={settings.savingsPercent}
                 onChange={(e) =>
-                  setSettings((prev) => ({
-                    ...prev,
-                    savingsPercent: e.target.valueAsNumber,
-                  }))
+                  setValue("savingsPercent", e.target.valueAsNumber)
                 }
                 placeholder="5"
                 className="block w-full min-w-0 flex-1 rounded-none rounded-l-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -186,12 +192,7 @@ export default function House() {
                 name="house-price"
                 type="number"
                 value={settings.housePrice}
-                onChange={(e) =>
-                  setSettings((prev) => ({
-                    ...prev,
-                    housePrice: e.target.valueAsNumber,
-                  }))
-                }
+                onChange={(e) => setValue("housePrice", e.target.valueAsNumber)}
                 placeholder="10000"
                 className="block w-full min-w-0 flex-1 rounded-none rounded-r-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               />
@@ -211,10 +212,7 @@ export default function House() {
                 type="number"
                 value={settings.houseDepositPercentage}
                 onChange={(e) =>
-                  setSettings((prev) => ({
-                    ...prev,
-                    houseDepositPercentage: e.target.valueAsNumber,
-                  }))
+                  setValue("houseDepositPercentage", e.target.valueAsNumber)
                 }
                 placeholder="5"
                 className="block w-full min-w-0 flex-1 rounded-none rounded-l-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -238,10 +236,7 @@ export default function House() {
                 type="number"
                 value={settings.houseValueAppreciate}
                 onChange={(e) =>
-                  setSettings((prev) => ({
-                    ...prev,
-                    houseValueAppreciate: e.target.valueAsNumber,
-                  }))
+                  setValue("houseValueAppreciate", e.target.valueAsNumber)
                 }
                 placeholder="5"
                 className="block w-full min-w-0 flex-1 rounded-none rounded-l-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -270,10 +265,7 @@ export default function House() {
                 type="number"
                 value={settings.mortgageTerm}
                 onChange={(e) =>
-                  setSettings((prev) => ({
-                    ...prev,
-                    mortgageTerm: e.target.valueAsNumber,
-                  }))
+                  setValue("mortgageTerm", e.target.valueAsNumber)
                 }
                 placeholder="5"
                 className="block w-full min-w-0 flex-1 rounded-none rounded-l-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -297,10 +289,7 @@ export default function House() {
                 type="number"
                 value={settings.mortgageRate}
                 onChange={(e) =>
-                  setSettings((prev) => ({
-                    ...prev,
-                    mortgageRate: e.target.valueAsNumber,
-                  }))
+                  setValue("mortgageRate", e.target.valueAsNumber)
                 }
                 placeholder="5"
                 className="block w-full min-w-0 flex-1 rounded-none rounded-l-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -312,7 +301,7 @@ export default function House() {
           </div>
         </div>
       </div>
-      <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-10 sm:rounded-lg max-h-[1000px] overflow-y-scroll w-full">
+      <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-10 sm:rounded-lg max-h-[1000px] h-min overflow-y-scroll w-full">
         <table className="divide-y divide-gray-300 max-h-[1000px] w-full">
           <thead className="bg-gray-100 sticky top-0 z-10">
             <tr>
