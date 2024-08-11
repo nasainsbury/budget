@@ -422,7 +422,12 @@ export default function House() {
                   {formatValue(result.salary * settings.savingsPercent)}
                 </td>
                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
-                  {formatValue(result.savings)}
+                  <div className="flex gap-x-2 items-end">
+                    <span>{formatValue(result.savings)}</span>
+                    <span className="text-xs text-gray-400">
+                      {formatValue(result.realTermsSavings)}
+                    </span>
+                  </div>
                 </td>
                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
                   {formatValue(result.savingsInterestAccrued)}
