@@ -10,17 +10,17 @@ function formatValue(value: number) {
 
 export default function House() {
   const [settings, setSettings] = useState<HouseConfig>({
-    houseDepositPercentage: 0.05,
+    houseDepositPercentage: 5,
     housePrice: 250000,
     startingBalance: 25000,
-    houseValueAppreciate: 0.02, // 2%
-    mortgageRate: 0.05, //5.5%
+    houseValueAppreciate: 2,
+    mortgageRate: 5.5,
     mortgageTerm: 25,
     salary: 3100,
-    salaryIncrease: 0.03,
-    savingsInterest: 0.1,
-    savingsPercent: 0.2,
-    inflation: 0.02,
+    salaryIncrease: 3,
+    savingsInterest: 9,
+    savingsPercent: 20,
+    inflation: 2,
   });
   const results = generateHouseBudget(settings);
 
@@ -68,11 +68,11 @@ export default function House() {
                 id="salary-increase"
                 name="salary-increase"
                 type="number"
-                value={settings.salaryIncrease * 100}
+                value={settings.salaryIncrease}
                 onChange={(e) =>
                   setSettings((prev) => ({
                     ...prev,
-                    salaryIncrease: e.target.valueAsNumber / 100,
+                    salaryIncrease: e.target.valueAsNumber,
                   }))
                 }
                 placeholder="5"
@@ -125,11 +125,11 @@ export default function House() {
                 id="savings-interest"
                 name="savings-interest"
                 type="number"
-                value={settings.savingsInterest * 100}
+                value={settings.savingsInterest}
                 onChange={(e) =>
                   setSettings((prev) => ({
                     ...prev,
-                    savingsInterest: e.target.valueAsNumber / 100,
+                    savingsInterest: e.target.valueAsNumber,
                   }))
                 }
                 placeholder="5"
@@ -152,11 +152,11 @@ export default function House() {
                 id="percent-save"
                 name="percent-save"
                 type="number"
-                value={settings.savingsPercent * 100}
+                value={settings.savingsPercent}
                 onChange={(e) =>
                   setSettings((prev) => ({
                     ...prev,
-                    savingsPercent: e.target.valueAsNumber / 100,
+                    savingsPercent: e.target.valueAsNumber,
                   }))
                 }
                 placeholder="5"
@@ -209,11 +209,11 @@ export default function House() {
                 id="deposit"
                 name="deposit"
                 type="number"
-                value={settings.houseDepositPercentage * 100}
+                value={settings.houseDepositPercentage}
                 onChange={(e) =>
                   setSettings((prev) => ({
                     ...prev,
-                    houseDepositPercentage: e.target.valueAsNumber / 100,
+                    houseDepositPercentage: e.target.valueAsNumber,
                   }))
                 }
                 placeholder="5"
@@ -236,11 +236,11 @@ export default function House() {
                 id="house-increase"
                 name="house-increase"
                 type="number"
-                value={settings.houseValueAppreciate * 100}
+                value={settings.houseValueAppreciate}
                 onChange={(e) =>
                   setSettings((prev) => ({
                     ...prev,
-                    houseValueAppreciate: e.target.valueAsNumber / 100,
+                    houseValueAppreciate: e.target.valueAsNumber,
                   }))
                 }
                 placeholder="5"
@@ -272,7 +272,7 @@ export default function House() {
                 onChange={(e) =>
                   setSettings((prev) => ({
                     ...prev,
-                    houseDepositPercentage: e.target.valueAsNumber,
+                    mortgageTerm: e.target.valueAsNumber,
                   }))
                 }
                 placeholder="5"
@@ -295,11 +295,11 @@ export default function House() {
                 id="rate"
                 name="rate"
                 type="number"
-                value={settings.mortgageRate * 100}
+                value={settings.mortgageRate}
                 onChange={(e) =>
                   setSettings((prev) => ({
                     ...prev,
-                    mortgageRate: e.target.valueAsNumber / 100,
+                    mortgageRate: e.target.valueAsNumber,
                   }))
                 }
                 placeholder="5"
@@ -419,7 +419,7 @@ export default function House() {
                   {formatValue(result.salary)}
                 </td>
                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
-                  {formatValue(result.salary * settings.savingsPercent)}
+                  {formatValue(result.salary * (settings.savingsPercent / 100))}
                 </td>
                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
                   <div className="flex gap-x-2 items-end">

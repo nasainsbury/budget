@@ -4,9 +4,11 @@ export function generateHouseBudget(config: HouseConfig) {
   const year = new Date().getFullYear();
   const budget: HousePeriod[] = [];
 
-  const monthlyMorgateRate = config.mortgageRate / 12;
-  const principal = config.housePrice * (1 - config.houseDepositPercentage);
+  const monthlyMorgateRate = config.mortgageRate / 100 / 12;
+  const principal =
+    config.housePrice * (1 - config.houseDepositPercentage / 100);
   const totalPayments = config.mortgageTerm * 12;
+  const inflation = config.inflation / 100;
 
   const monthlyPayment =
     (principal *
@@ -23,18 +25,18 @@ export function generateHouseBudget(config: HouseConfig) {
     const previousSavings = previousYear
       ? previousYear.savings
       : config.startingBalance -
-        config.housePrice * config.houseDepositPercentage;
+        (config.housePrice * config.houseDepositPercentage) / 100;
     const previousBalance = previousYear
       ? previousYear.houseRemainingBalance
-      : config.housePrice * (1 - config.houseDepositPercentage);
+      : config.housePrice * (1 - config.houseDepositPercentage / 100);
     const previousHouseValue = previousYear
       ? previousYear.houseValue
       : config.housePrice;
 
-    const salary = increaseValue(previousSalary, config.salaryIncrease);
+    const salary = increaseValue(previousSalary, config.salaryIncrease / 100);
 
     // Calculate Interset
-    const savingsPerMonth = salary * config.savingsPercent;
+    const savingsPerMonth = (salary * config.savingsPercent) / 100;
     let savings = previousSavings;
     let savingsInterestAmount = 0;
 
@@ -44,7 +46,7 @@ export function generateHouseBudget(config: HouseConfig) {
 
     for (let month = 1; month < 12; month++) {
       // Savings
-      const monthlyInterest = savings * (config.savingsInterest / 12);
+      const monthlyInterest = savings * (config.savingsInterest / 1200);
       savings += monthlyInterest;
       savings += savingsPerMonth;
       savingsInterestAmount += monthlyInterest;
@@ -58,19 +60,19 @@ export function generateHouseBudget(config: HouseConfig) {
 
     const period: HousePeriod = {
       year: year + elapsedYears,
-      salary: increaseValue(previousSalary, config.salaryIncrease),
+      salary: increaseValue(previousSalary, config.salaryIncrease / 100),
       houseValue: increaseValue(
         previousHouseValue,
-        config.houseValueAppreciate
+        config.houseValueAppreciate / 100
       ),
       mortgagePayment: monthlyPayment,
       houseRemainingBalance: remainingBalance,
       interestPaid: yearlyMorgateInterestPaid,
       savings: savings,
-      realTermsSavings: savings * Math.pow(1 - config.inflation, elapsedYears),
+      realTermsSavings: savings * Math.pow(1 - inflation, elapsedYears),
       savingsInterestAccrued: savingsInterestAmount,
       realTermsInterest:
-        savingsInterestAmount * Math.pow(1 - config.inflation, elapsedYears),
+        savingsInterestAmount * Math.pow(1 - inflation, elapsedYears),
     };
 
     budget.push(period);
