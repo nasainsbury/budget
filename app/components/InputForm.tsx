@@ -11,7 +11,7 @@ function formatAmount(value: number) {
     return `£${value.toFixed(0)}`;
   }
 }
-export default function () {
+function InputForm() {
   // const budget = generateBudgetOutput(
   //   {
   //     debt: [
@@ -256,3 +256,5 @@ export default function () {
 
   return <h1></h1>;
 }
+
+export default InputForm;
