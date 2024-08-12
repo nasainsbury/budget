@@ -23,7 +23,11 @@ const defaultSettings = {
 };
 
 function getSettings() {
-  const localStorageSettings = window.localStorage.getItem("settings");
+  let localStorageSettings = null;
+
+  try {
+    localStorageSettings = localStorage.getItem("settings");
+  } catch (err) {}
 
   const settings = localStorageSettings
     ? JSON.parse(localStorageSettings)
@@ -44,7 +48,9 @@ export default function House() {
     };
 
     setSettings(state);
-    window.localStorage.setItem("settings", JSON.stringify(state));
+    try {
+      localStorage.setItem("settings", JSON.stringify(state));
+    } catch (err) {}
   }, []);
 
   return (
