@@ -1,260 +1,193 @@
 "use client";
 
-import { generateBudgetOutput } from "../utils/generateBudgetOutput";
+import { generateBudget } from "../utils/generateBudgetOutput";
 import { DateTime } from "luxon";
 import clsx from "classnames";
 
-function formatAmount(value: number) {
-  if (Number.isInteger(value)) {
-    return `£${value}`;
-  } else {
-    return `£${value.toFixed(0)}`;
-  }
+function formatValue(value: number) {
+  return `£${Math.round(value).toLocaleString()}`;
 }
+
 function InputForm() {
-  const budget = generateBudgetOutput(
+  const budget = generateBudget(
     {
-      debt: [
-        {
-          amount: 450,
-          name: "Monzo",
-          startingAmount: 6826,
+      meta: {
+        netRemaining: {
+          name: "ISA",
+          type: "savings",
         },
+      },
+      income: [
         {
-          amount: 50,
-          name: "Phone",
-          startingAmount: 550,
+          amount: 4357,
+          name: "Salary",
+          increasePerAnnum: 5,
         },
       ],
       expenses: [
         {
           amount: 1250,
           name: "Rent",
-          yearlyIncrease: 0.02,
+          increasePerAnnum: 2,
         },
         {
           amount: 150,
           name: "Parking",
-          yearlyIncrease: 0,
+          increasePerAnnum: 0,
         },
         {
           amount: 110,
           name: "Council Tax",
-          yearlyIncrease: 0.03,
+          increasePerAnnum: 3,
         },
         {
           amount: 28,
           name: "Water",
-          yearlyIncrease: 0.03,
+          increasePerAnnum: 3,
         },
         {
           amount: 100,
           name: "Energy",
-          yearlyIncrease: 0.03,
+          increasePerAnnum: 3,
         },
         {
           amount: 91,
           name: "Car Insurance",
-          yearlyIncrease: -0.2,
+          increasePerAnnum: -20,
         },
         {
           amount: 30,
           name: "Subscriptions",
-          yearlyIncrease: 0.03,
+          increasePerAnnum: 3,
         },
         {
           amount: 700,
           name: "General",
-          yearlyIncrease: 0.03,
+          increasePerAnnum: 3,
         },
         {
           amount: 38,
           name: "Internet",
-          yearlyIncrease: 0.02,
+          increasePerAnnum: 2,
+        },
+      ],
+      debt: [
+        {
+          amount: 450,
+          increasePerAnnum: 0,
+          name: "Monzo Loan",
+          startingBalance: 6750,
+        },
+        {
+          amount: 50,
+          increasePerAnnum: 0,
+          name: "Phone Loan",
+          startingBalance: 500,
         },
       ],
       savings: [
         {
-          amount: 1200,
-          name: "Easy Access",
-          startingAmount: 11000,
-          yearlyIncrease: 0.05,
-          yearlyInterest: 0.045,
+          amount: 500,
+          annualInterest: 9,
+          increasePerAnnum: 5,
+          interestPaid: "monthly",
+          name: "ISA",
+          startingBalance: 300,
         },
-      ],
-      income: [
         {
-          amount: 4357,
-          name: "Salary",
-          yearlyIncrease: 0.05,
+          amount: 500,
+          annualInterest: 4.4,
+          increasePerAnnum: 5,
+          interestPaid: "monthly",
+          name: "Pot",
+          startingBalance: 10800,
         },
       ],
-      inflation: 0,
-      oneOffExpenses: [],
     },
-    24
+    DateTime.now(),
+    20
   );
 
   return (
-    <table className="divide-y divide-gray-400 mx-auto overflow-x-scroll max-w-[1200px]">
-      <thead>
-        <tr>
-          <th className="border-2 border-stone-800"></th>
-          {budget.map((month) => (
-            <th className="py-2 px-4 text-left  font-semibold text-stone-800 border-2 border-stone-800 even:bg-gray-100">
-              {month.date.toFormat("MMM yyyy")}
+    <div className="col-span-9 overflow-hidden shadow ring-1 ring-black ring-opacity-10 sm:rounded-lg max-h-[1000px] overflow-y-scroll w-full">
+      <table className="divide-y divide-gray-300 max-h-[1000px] w-full">
+        <thead className="bg-gray-100 sticky top-0 z-10">
+          <tr>
+            <th
+              className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
+              scope="col"
+            >
+              Year
             </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody className="divide-y divide-gray-200 bg-white">
-        {/* Income */}
-        {budget[0].income.breakdown.map((income, index) => (
-          <tr>
-            <td className="border py-2 px-4 even:bg-emerald-50 odd:bg-emerald-100 font-semibold text-stone-800 border-x-2 border-x-stone-800">
-              {income.name}
-            </td>
-            {budget.map((month) => (
-              <td className="border py-2 px-4 even:bg-emerald-50 odd:bg-emerald-100 border-x-2 border-x-stone-800">
-                {formatAmount(month.income.breakdown[index].amount)}
-              </td>
-            ))}
-          </tr>
-        ))}
-        <tr>
-          <td className="border py-2 px-4 even:bg-emerald-300 odd:bg-emerald-500 font-semibold text-stone-800 border-y-2 border-y-stone-700 border-x-2 border-x-stone-800">
-            Total
-          </td>
-          {budget.map((month) => (
-            <td className="py-2 px-4 even:bg-emerald-300 odd:bg-emerald-500 border border-y-2 border-y-stone-700 font-semibold border-x-2 border-x-stone-800">
-              {formatAmount(month.income.total)}
-            </td>
-          ))}
-        </tr>
-        {/* Expenses */}
-        {budget[0].expenses.breakdown.map((expense, index) => (
-          <tr>
-            <td className="border py-2 px-4  font-semibold text-stone-800 even:bg-red-50 odd:bg-red-100 border-x-2 border-x-stone-800">
-              {expense.name}
-            </td>
-            {budget.map((month) => (
-              <td className="border py-2 px-4 even:bg-red-50 odd:bg-red-100 border-x-2 border-x-stone-800">
-                {formatAmount(month.expenses.breakdown[index].amount)}
-              </td>
-            ))}
-          </tr>
-        ))}
-        <tr>
-          <td className="border py-2 px-4 even:bg-red-50 odd:bg-red-100 border-x-2 border-x-stone-800 font-semibold">
-            One offs
-          </td>
-          {budget.map((month) => (
-            <td className="border py-2 px-4 even:bg-red-50 odd:bg-red-100 border-x-2 border-x-stone-800">
-              {formatAmount(0)}
-            </td>
-          ))}
-        </tr>
-        <tr>
-          <td className="border py-2 px-4 even:bg-red-300 odd:bg-red-500 font-semibold text-stone-800 border-y-2 border-y-stone-700 border-x-2 border-x-stone-800">
-            Total
-          </td>
-          {budget.map((month) => (
-            <td className="border py-2 px-4 even:bg-red-300 odd:bg-red-500 border-y-2 border-y-stone-700 font-semibold border-x-2 border-x-stone-800">
-              ({formatAmount(month.expenses.total)})
-            </td>
-          ))}
-        </tr>
 
-        {/* Debts */}
-        {budget[0].debt.breakdown.map((debt, index) => (
-          <tr>
-            <td className="border py-2 px-4  font-semibold text-stone-800 even:bg-orange-50 odd:bg-orange-100 border-x-2 border-x-stone-800">
-              {debt.name}
-            </td>
-            {budget.map((month) => (
-              <td className="border py-2 px-4 even:bg-orange-50 odd:bg-orange-100 border-x-2 border-x-stone-800">
-                {formatAmount(month.debt.breakdown[index].amount)}
-              </td>
-            ))}
+            <th
+              className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+              scope="col"
+            >
+              Income
+            </th>
+            <th
+              className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+              scope="col"
+            >
+              Expenses
+            </th>
+            <th
+              className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+              scope="col"
+            >
+              Debt
+            </th>
+            <th
+              className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+              scope="col"
+            >
+              Total Savings
+            </th>
           </tr>
-        ))}
-        <tr>
-          <td className="border py-2 px-4 even:bg-orange-300 odd:bg-orange-500 font-semibold text-stone-800 border-y-2 border-y-stone-700 border-x-2 border-x-stone-800">
-            Total
-          </td>
-          {budget.map((month) => (
-            <td className="border py-2 px-4 even:bg-orange-300 odd:bg-orange-500 border-y-2 border-y-stone-700 font-semibold border-x-2 border-x-stone-800">
-              ({formatAmount(month.debt.total)})
-            </td>
-          ))}
-        </tr>
-        {/* Savings */}
-        {budget[0].savings.breakdown.map((savings, index) => (
-          <tr>
-            <td className="border py-2 px-4  font-semibold text-stone-800 even:bg-teal-50 odd:bg-teal-100 border-x-2 border-x-stone-800">
-              {savings.name}
-            </td>
-            {budget.map((month) => (
-              <td className="border py-2 px-4 even:bg-teal-50 odd:bg-teal-100 border-x-2 border-x-stone-800">
-                <div className="flex flex-col gap-y-2">
-                  <span>
-                    ({formatAmount(month.savings.breakdown[index].amount)})
+        </thead>
+        <tbody className="divide-y divide-gray-200 bg-white">
+          {budget.map((result) => (
+            <tr
+              className="even:bg-gray-100 hover:bg-yellow-100"
+              key={result.date.toString()}
+            >
+              <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                <button onClick={() => console.log("cool")}>
+                  {result.date.monthLong} {result.date.year}
+                </button>
+              </td>
+              <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
+                {formatValue(result.income.total)}
+              </td>
+              <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
+                {formatValue(result.expenses.total)}
+              </td>
+              <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
+                <div className="flex gap-x-2 items-end">
+                  <span className="font-bold">
+                    {formatValue(result.debt.total)}
                   </span>
-                  <span className="text-xs text-gray-700 flex flex-col gap-y-2">
-                    {formatAmount(month.savings.breakdown[index].total)}
+                  <span className="text-xs text-gray-400">
+                    {formatValue(result.debt.totalBalance)}
                   </span>
-                  {month.savings.breakdown[index].interest > 0 && (
-                    <span className="text-xs text-gray-700">
-                      Interest accured{" "}
-                      {formatAmount(month.savings.breakdown[index].interest)}
-                    </span>
-                  )}
                 </div>
               </td>
-            ))}
-          </tr>
-        ))}
-
-        <tr>
-          <td className="border py-2 px-4  font-semibold text-stone-800 even:bg-teal-50 odd:bg-teal-100 border-x-2 border-x-stone-800">
-            Leftovers
-          </td>
-          {budget.map((month) => (
-            <td keyclassName="border py-2 px-4 even:bg-teal-50 odd:bg-teal-100 border-x-2 border-x-stone-800">
-              <div className="flex flex-col gap-y-2">
-                <span>{formatAmount(month.leftOver)}</span>
-                <span className="text-xs text-gray-700">
-                  {formatAmount(month.totalLeftOver)}
-                </span>
-              </div>
-            </td>
+              <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
+                <div className="flex gap-x-2 items-end">
+                  <span className="font-bold">
+                    {formatValue(result.savings.total)}
+                  </span>
+                  <span className="text-xs text-gray-400">
+                    {formatValue(result.savings.totalBalance)}
+                  </span>
+                </div>
+              </td>
+            </tr>
           ))}
-        </tr>
-        <tr>
-          <td className="border py-2 px-4 even:bg-teal-300 odd:bg-teal-500 font-semibold text-stone-800 border-y-2 border-y-stone-700 border-x-2 border-x-stone-800">
-            Total
-          </td>
-          {budget.map((month) => (
-            <td
-              key={month.date.toString()}
-              className="border py-2 px-4 even:bg-teal-300 odd:bg-teal-500 border-y-2 border-y-stone-700 font-semibold border-x-2 border-x-stone-800"
-            >
-              <div className="flex flex-col gap-y-2">
-                <span>
-                  {formatAmount(month.savings.total + month.leftOver)}
-                </span>
-                <span className="text-xs text-gray-700">
-                  {formatAmount(
-                    month.totalLeftOver +
-                      month.savings.breakdown.reduce((a, b) => a + b.total, 0)
-                  )}
-                </span>
-              </div>
-            </td>
-          ))}
-        </tr>
-      </tbody>
-    </table>
+        </tbody>
+      </table>
+    </div>
   );
 }
 

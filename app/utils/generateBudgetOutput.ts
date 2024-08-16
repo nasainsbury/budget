@@ -11,7 +11,7 @@ export function generateBudget(
 
   for (let month = 0; month < months; month++) {
     const previousMonth = periods[month - 1] ?? null;
-    const shouldIncrease = date.get("month") === 12;
+    const shouldIncrease = date.get("month") === 1;
 
     const budgetPeriod: BudgetPeriod = {
       date,
@@ -37,6 +37,8 @@ export function generateBudget(
 
     // Calculate income
     config.income.forEach((income, index) => {
+      const increasePerAnnum = income.increasePerAnnum / 100;
+
       const field = {
         name: income.name,
         amount: 0,
@@ -50,8 +52,7 @@ export function generateBudget(
       }
 
       if (shouldIncrease) {
-        field.increase = field.amount * (1 + income.increasePerAnnum);
-        field.amount += field.increase;
+        field.amount = field.amount * (1 + increasePerAnnum);
       }
 
       budgetPeriod.income.total += field.amount;
@@ -60,6 +61,8 @@ export function generateBudget(
 
     // Calculate expenses
     config.expenses.forEach((expense, index) => {
+      const increasePerAnnum = expense.increasePerAnnum / 100;
+
       const field = {
         name: expense.name,
         amount: 0,
@@ -73,8 +76,7 @@ export function generateBudget(
       }
 
       if (shouldIncrease) {
-        field.increase = field.amount * (1 + expense.increasePerAnnum);
-        field.amount += field.increase;
+        field.amount = field.amount * (1 + increasePerAnnum);
       }
 
       budgetPeriod.expenses.total += field.amount;
@@ -82,31 +84,103 @@ export function generateBudget(
     });
 
     // Calculate debt
-    config.debt.forEach((income, index) => {
+    config.debt.forEach((debt, index) => {
+      const increasePerAnnum = debt.increasePerAnnum / 100;
+
       const field = {
-        name: income.name,
+        name: debt.name,
         amount: 0,
-        increase: 0,
         balance: 0,
       };
 
       if (previousMonth) {
-        field.amount = previousMonth.income.fields[index].amount;
+        field.amount = previousMonth.debt.fields[index].amount;
+        field.balance = previousMonth.debt.fields[index].balance;
       } else {
-        field.amount = income.amount;
+        field.amount = debt.amount;
+        field.balance = debt.startingBalance;
       }
 
       if (shouldIncrease) {
-        field.increase = field.amount * (1 + income.increasePerAnnum);
-        field.amount += field.increase;
+        field.amount = field.amount * (1 + increasePerAnnum);
       }
 
-      field.balance -= field.amount;
+      if (field.amount >= field.balance) {
+        field.amount = field.balance;
+        field.balance = 0;
+      } else {
+        field.balance -= field.amount;
+      }
 
-      budgetPeriod.income.total += field.amount;
+      budgetPeriod.debt.total += field.amount;
       budgetPeriod.debt.totalBalance += field.balance;
       budgetPeriod.debt.fields.push(field);
     });
+
+    // Calculate savings
+    config.savings.forEach((savings, index) => {
+      const increasePerAnnum = savings.increasePerAnnum / 100;
+      const interestRate = savings.annualInterest / 100;
+
+      const field = {
+        name: savings.name,
+        amount: 0,
+        balance: 0,
+        interest: 0,
+      };
+
+      // set defaults
+      if (previousMonth) {
+        field.amount = previousMonth.savings.fields[index].amount;
+        field.balance = previousMonth.savings.fields[index].balance;
+      } else {
+        field.amount = savings.amount;
+        field.balance = savings.startingBalance;
+      }
+
+      if (shouldIncrease) {
+        field.amount = field.amount * (1 + increasePerAnnum);
+      }
+
+      if (savings.interestPaid === "yearly") {
+        if (shouldIncrease) {
+          field.interest = field.balance * interestRate;
+        }
+      } else {
+        // "monthly"
+        field.interest = field.balance * (interestRate / 12);
+      }
+
+      field.balance += field.amount + field.interest;
+
+      budgetPeriod.savings.total += field.amount;
+      budgetPeriod.savings.totalBalance += field.balance;
+      budgetPeriod.savings.fields.push(field);
+    });
+
+    const net =
+      budgetPeriod.income.total -
+      budgetPeriod.debt.total -
+      budgetPeriod.expenses.total -
+      budgetPeriod.savings.total;
+
+    const netName = config.meta.netRemaining.name;
+
+    if (config.meta.netRemaining.type === "savings") {
+      let found = false;
+
+      budgetPeriod.savings.fields.forEach((field, index) => {
+        if (field.name === netName) {
+          budgetPeriod.savings.fields[index].amount += net;
+          budgetPeriod.savings.fields[index].balance += net;
+          found = true;
+        }
+      });
+
+      if (found) {
+        budgetPeriod.savings.total += net;
+      }
+    }
 
     // Incremement the month
     date = startingDate.set({ month: date.month + 1 });

@@ -46,7 +46,6 @@ export type BudgetIncome = {
   fields: Array<{
     name: string;
     amount: number;
-    increase: number;
   }>;
 };
 
@@ -55,7 +54,6 @@ export type BudgetExpense = {
   fields: Array<{
     name: string;
     amount: number;
-    increase: number;
   }>;
 };
 
@@ -66,7 +64,6 @@ export type BudgetDebt = {
     name: string;
     amount: number;
     balance: number;
-    increase: number;
   }>;
 };
 
@@ -77,7 +74,6 @@ export type BudgetSavings = {
     name: string;
     amount: number;
     balance: number;
-    increase?: number;
     interest?: number;
   }>;
 };
