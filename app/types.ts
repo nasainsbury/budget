@@ -1,66 +1,88 @@
 import { DateTime } from "luxon";
+
 export type BudgetConfig = {
-  inflation: number;
-  income: Money[];
-  expenses: Money[];
-  savings: Savings[];
-  debt: Debt[];
-  oneOffExpenses: OneOffExpense[];
-};
-
-export type OneOffExpense = {
-  name: string;
-  amount: number;
-  date: DateTime;
-};
-
-export type Money = {
-  name: string;
-  amount: number;
-  yearlyIncrease: number;
-};
-
-export type Savings = {
-  name: string;
-  startingAmount: number;
-  amount: number;
-  yearlyIncrease: number;
-  yearlyInterest: number;
-};
-
-export type Debt = {
-  name: string;
-  startingAmount: number;
-  amount: number;
-};
-
-export type BudgetOutput = {
-  date: DateTime;
-  leftOver: number;
-  totalLeftOver: number;
-  income: {
-    total: number;
-    breakdown: Array<{ name: string; amount: number }>;
-  };
-  expenses: {
-    total: number;
-    breakdown: Array<{ name: string; amount: number }>;
-  };
-  savings: {
-    total: number;
-    breakdown: Array<{
+  income: IncomeConfig[];
+  expenses: ExpensesConfig[];
+  debt: DebtConfig[];
+  savings: SavingsConfig[];
+  meta: {
+    netRemaining: {
       name: string;
-      amount: number;
-      total: number;
-      interest: number;
-    }>;
-  };
-  debt: {
-    total: number;
-    breakdown: Array<{ name: string; amount: number; remaining: number }>;
+      type: "expenses" | "savings";
+    };
   };
 };
 
+export type CommonConfig = {
+  name: string;
+  amount: number;
+  increasePerAnnum: number;
+};
+
+export type IncomeConfig = {} & CommonConfig;
+export type ExpensesConfig = {} & CommonConfig;
+
+export type DebtConfig = {
+  startingBalance: number;
+} & CommonConfig;
+
+export type SavingsConfig = {
+  startingBalance: number;
+  annualInterest: number;
+  interestPaid: "yearly" | "monthly";
+} & CommonConfig;
+
+/* BudgetOutput */
+export type BudgetPeriod = {
+  date: DateTime;
+  income: BudgetIncome;
+  expenses: BudgetExpense;
+  debt: BudgetDebt;
+  savings: BudgetSavings;
+};
+
+export type BudgetIncome = {
+  total: number;
+  fields: Array<{
+    name: string;
+    amount: number;
+    increase: number;
+  }>;
+};
+
+export type BudgetExpense = {
+  total: number;
+  fields: Array<{
+    name: string;
+    amount: number;
+    increase: number;
+  }>;
+};
+
+export type BudgetDebt = {
+  total: number;
+  totalBalance: number;
+  fields: Array<{
+    name: string;
+    amount: number;
+    balance: number;
+    increase: number;
+  }>;
+};
+
+export type BudgetSavings = {
+  total: number;
+  totalBalance: number;
+  fields: Array<{
+    name: string;
+    amount: number;
+    balance: number;
+    increase?: number;
+    interest?: number;
+  }>;
+};
+
+/** HOUSE */
 export type HouseConfig = {
   housePrice: number;
   houseDepositPercentage: number;

@@ -1,155 +1,118 @@
-import { BudgetConfig, BudgetOutput } from "../types";
 import { DateTime } from "luxon";
+import { type BudgetPeriod, type BudgetConfig } from "../types";
 
-export function generateBudgetOutput(config: BudgetConfig, months: number) {
-  let date = DateTime.now();
-  let budgetArray: BudgetOutput[] = [];
-  console.log(date);
+export function generateBudget(
+  config: BudgetConfig,
+  startingDate: DateTime,
+  months: number
+): BudgetPeriod[] {
+  const periods: BudgetPeriod[] = [];
+  let date = startingDate;
+
   for (let month = 0; month < months; month++) {
-    const increase = date.get("month") === 1 && month !== 0;
-    let budget: BudgetOutput = {
-      date: date,
-      debt: {
+    const previousMonth = periods[month - 1] ?? null;
+    const shouldIncrease = date.get("month") === 12;
+
+    const budgetPeriod: BudgetPeriod = {
+      date,
+      income: {
         total: 0,
-        breakdown: [],
+        fields: [],
       },
       expenses: {
         total: 0,
-        breakdown: [],
+        fields: [],
+      },
+      debt: {
+        total: 0,
+        totalBalance: 0,
+        fields: [],
       },
       savings: {
         total: 0,
-        breakdown: [],
+        totalBalance: 0,
+        fields: [],
       },
-      income: {
-        total: 0,
-        breakdown: [],
-      },
-      leftOver: 0,
-      totalLeftOver: 0,
     };
 
-    let previousMonth = budgetArray[month - 1];
-
+    // Calculate income
     config.income.forEach((income, index) => {
-      const breakdown = {
-        name: "",
+      const field = {
+        name: income.name,
         amount: 0,
+        increase: 0,
       };
-      if (month === 0) {
-        budget.income.total += income.amount;
-        breakdown.name = income.name;
-        breakdown.amount = income.amount;
+
+      if (previousMonth) {
+        field.amount = previousMonth.income.fields[index].amount;
       } else {
-        let amount = previousMonth.income.breakdown[index].amount;
-        if (increase) {
-          amount *= 1 + income.yearlyIncrease;
-        }
-        budget.income.total += amount;
-        breakdown.name = income.name;
-        breakdown.amount = amount;
+        field.amount = income.amount;
       }
-      budget.income.breakdown.push(breakdown);
+
+      if (shouldIncrease) {
+        field.increase = field.amount * (1 + income.increasePerAnnum);
+        field.amount += field.increase;
+      }
+
+      budgetPeriod.income.total += field.amount;
+      budgetPeriod.income.fields.push(field);
     });
 
+    // Calculate expenses
     config.expenses.forEach((expense, index) => {
-      const breakdown = {
-        name: "",
+      const field = {
+        name: expense.name,
         amount: 0,
-      };
-      if (month === 0) {
-        budget.expenses.total += expense.amount;
-        breakdown.name = expense.name;
-        breakdown.amount = expense.amount;
-      } else {
-        let amount = previousMonth.expenses.breakdown[index].amount;
-        if (increase) {
-          amount *= 1 + expense.yearlyIncrease;
-        }
-        budget.expenses.total += amount;
-        breakdown.name = expense.name;
-        breakdown.amount = amount;
-      }
-      budget.expenses.breakdown.push(breakdown);
-    });
-
-    config.debt.forEach((debt, index) => {
-      const breakdown = {
-        name: "",
-        amount: 0,
-        remaining: 0,
+        increase: 0,
       };
 
-      if (month === 0) {
-        budget.debt.total += debt.amount;
-        breakdown.name = debt.name;
-        breakdown.amount = debt.amount;
-        breakdown.remaining = debt.startingAmount - debt.amount;
+      if (previousMonth) {
+        field.amount = previousMonth.expenses.fields[index].amount;
       } else {
-        let amount = previousMonth.debt.breakdown[index].amount;
-        let remaining = previousMonth.debt.breakdown[index].remaining;
-
-        if (amount >= remaining) {
-          amount = remaining;
-          remaining = 0;
-        } else {
-          remaining -= amount;
-        }
-
-        budget.debt.total += amount;
-        breakdown.name = debt.name;
-        breakdown.amount = amount;
-        breakdown.remaining = remaining;
+        field.amount = expense.amount;
       }
-      budget.debt.breakdown.push(breakdown);
+
+      if (shouldIncrease) {
+        field.increase = field.amount * (1 + expense.increasePerAnnum);
+        field.amount += field.increase;
+      }
+
+      budgetPeriod.expenses.total += field.amount;
+      budgetPeriod.expenses.fields.push(field);
     });
 
-    config.savings.forEach((savings, index) => {
-      const breakdown = {
-        name: "",
+    // Calculate debt
+    config.debt.forEach((income, index) => {
+      const field = {
+        name: income.name,
         amount: 0,
-        total: 0,
-        interest: 0,
+        increase: 0,
+        balance: 0,
       };
-      if (month === 0) {
-        budget.savings.total += savings.amount;
-        breakdown.name = savings.name;
-        breakdown.amount = savings.amount;
-        breakdown.total = savings.startingAmount;
+
+      if (previousMonth) {
+        field.amount = previousMonth.income.fields[index].amount;
       } else {
-        let amount = previousMonth.savings.breakdown[index].amount;
-
-        if (increase) {
-          amount *= 1 + savings.yearlyIncrease;
-        }
-
-        let total = previousMonth.savings.breakdown[index].total + amount;
-        let interest = 0;
-
-        if (increase) {
-          interest = total * savings.yearlyInterest;
-        }
-
-        budget.savings.total += amount;
-        breakdown.name = savings.name;
-        breakdown.interest = interest;
-        breakdown.amount = amount;
-        breakdown.total = total;
+        field.amount = income.amount;
       }
-      budget.savings.breakdown.push(breakdown);
+
+      if (shouldIncrease) {
+        field.increase = field.amount * (1 + income.increasePerAnnum);
+        field.amount += field.increase;
+      }
+
+      field.balance -= field.amount;
+
+      budgetPeriod.income.total += field.amount;
+      budgetPeriod.debt.totalBalance += field.balance;
+      budgetPeriod.debt.fields.push(field);
     });
 
-    budget.leftOver =
-      budget.income.total -
-      budget.expenses.total -
-      budget.debt.total -
-      budget.savings.total;
-    budget.totalLeftOver =
-      (previousMonth?.totalLeftOver ?? 0) + budget.leftOver;
+    // Incremement the month
+    date = startingDate.set({ month: date.month + 1 });
 
-    budgetArray.push(budget);
-    date = date.set({ month: date.month + 1 });
+    periods.push(budgetPeriod);
   }
 
-  return budgetArray;
+  return periods;
 }

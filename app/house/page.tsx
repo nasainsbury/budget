@@ -1,8 +1,9 @@
 "use client";
 
-import { HouseConfig } from "../types";
+import useStickyState from "../hooks/useStickyValue";
+import { HouseConfig, HousePeriod } from "../types";
 import { generateHouseBudget } from "../utils/generateHouseBudget";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 function formatValue(value: number) {
   return `£${Math.round(value).toLocaleString()}`;
@@ -22,36 +23,31 @@ const defaultSettings = {
   inflation: 2,
 };
 
-function getSettings() {
-  let localStorageSettings = null;
-
-  try {
-    localStorageSettings = localStorage.getItem("settings");
-  } catch (err) {}
-
-  const settings = localStorageSettings
-    ? JSON.parse(localStorageSettings)
-    : defaultSettings;
-
-  return settings;
-}
-
 export default function House() {
-  const [settings, setSettings] = useState<HouseConfig>(getSettings());
+  const [settings, setSettings] = useStickyState<HouseConfig>(
+    defaultSettings,
+    "house-settings"
+  );
+  const [budget, setBudget] = useState<HousePeriod[]>([]);
 
-  const results = generateHouseBudget(settings);
-
-  const setValue = useCallback((field: string, value: number) => {
-    const state = {
-      ...settings,
-      [field]: value,
-    };
-
-    setSettings(state);
+  useEffect(() => {
+    setBudget(generateHouseBudget(settings));
     try {
-      localStorage.setItem("settings", JSON.stringify(state));
-    } catch (err) {}
-  }, []);
+      localStorage.setItem("settings", JSON.stringify(settings));
+    } catch (err) {
+      console.log(err);
+    }
+  }, [settings]);
+
+  const setValue = useCallback(
+    (field: string, value: number) => {
+      setSettings((state) => ({
+        ...state,
+        [field]: value,
+      }));
+    },
+    [setSettings]
+  );
 
   return (
     <main className="px-16 pt-8 flex gap-x-12 justify-between">
@@ -374,7 +370,7 @@ export default function House() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 bg-white">
-            {results.map((result) => (
+            {budget.map((result) => (
               <tr
                 className="even:bg-gray-100 hover:bg-yellow-100"
                 key={result.year}
