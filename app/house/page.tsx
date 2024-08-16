@@ -363,63 +363,80 @@ export default function House() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 bg-white">
-            {budget.map((result) => (
-              <tr
-                className="even:bg-gray-100 hover:bg-yellow-100"
-                key={result.year}
-              >
-                <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                  {result.year}
-                </td>
-                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
-                  {formatValue(result.houseValue)}
-                </td>
-                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
-                  {formatValue(result.houseRemainingBalance)}
-                </td>
-                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
-                  {(
-                    100 -
-                    (result.houseRemainingBalance * 100) / result.houseValue
-                  ).toFixed(1)}
-                  %
-                </td>
-                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
-                  <div className="flex gap-x-2 items-end">
-                    <span>{formatValue(result.mortgagePayment)}</span>
-                    <span className="text-xs text-gray-400">
-                      {(
-                        (result.mortgagePayment / result.salary) *
-                        100
-                      ).toPrecision(3)}
-                      %
-                    </span>
-                  </div>
-                </td>
-                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
-                  {formatValue(result.interestPaid)}
-                </td>
-                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
-                  {formatValue(result.salary)}
-                </td>
-                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
-                  {formatValue(result.salary * (settings.savingsPercent / 100))}
-                </td>
-                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
-                  <div className="flex gap-x-2 items-end">
-                    <span className="font-bold">
-                      {formatValue(result.savings)}
-                    </span>
-                    <span className="text-xs text-gray-400">
-                      {formatValue(result.realTermsSavings)}
-                    </span>
-                  </div>
-                </td>
-                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
-                  {formatValue(result.savingsInterestAccrued)}
-                </td>
-              </tr>
-            ))}
+            {budget.map((result) => {
+              const paymentPercetnage =
+                (result.mortgagePayment / result.salary) * 100;
+
+              return (
+                <tr
+                  className="even:bg-gray-100 hover:bg-yellow-100"
+                  key={result.year}
+                >
+                  <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                    {result.year}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
+                    {formatValue(result.houseValue)}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
+                    {formatValue(result.houseRemainingBalance)}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
+                    {(
+                      100 -
+                      (result.houseRemainingBalance * 100) / result.houseValue
+                    ).toFixed(1)}
+                    %
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
+                    <div className="flex gap-x-2 items-end">
+                      <span
+                        className={`${
+                          paymentPercetnage > 30
+                            ? "text-red-800 font-bold"
+                            : "text-gray-600"
+                        }`}
+                      >
+                        {formatValue(result.mortgagePayment)}
+                      </span>
+                      <span
+                        className={`text-xs ${
+                          paymentPercetnage > 30
+                            ? "text-red-800 font-bold"
+                            : "text-gray-400"
+                        }`}
+                      >
+                        {paymentPercetnage.toPrecision(3)}%
+                      </span>
+                    </div>
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
+                    {formatValue(result.interestPaid)}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
+                    {formatValue(result.salary)}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
+                    {formatValue(
+                      result.salary * (settings.savingsPercent / 100)
+                    )}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
+                    <div className="flex gap-x-2 items-end">
+                      <span className="font-bold">
+                        {formatValue(result.savings)}
+                      </span>
+                      <span className="text-xs text-gray-400">
+                        {formatValue(result.realTermsSavings)}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
+                    {formatValue(result.savingsInterestAccrued)}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
