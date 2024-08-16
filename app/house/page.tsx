@@ -50,10 +50,10 @@ export default function House() {
   );
 
   return (
-    <main className="px-16 pt-8 flex gap-x-12 justify-between">
-      <div className="flex flex-col gap-y-8">
+    <main className="px-12 pt-8 grid grid-cols-12  gap-x-12 justify-between">
+      <div className="gap-y-8 col-span-3 flex flex-col">
         <div className="flex flex-col gap-y-2">
-          <h2 className="text-gray-900 font-bold text-lg underline">Salary</h2>
+          <h2 className="text-gray-900 font-bold text-lg ">Salary</h2>
           <div>
             <label
               htmlFor="salary"
@@ -102,7 +102,7 @@ export default function House() {
           </div>
         </div>
         <div className="flex flex-col gap-y-2">
-          <h2 className="text-gray-900 font-bold text-lg underline">Savings</h2>
+          <h2 className="text-gray-900 font-bold text-lg ">Savings</h2>
           <div>
             <label
               htmlFor="balance"
@@ -177,7 +177,7 @@ export default function House() {
           </div>
         </div>
         <div className="flex flex-col gap-y-2">
-          <h2 className="text-gray-900 font-bold text-lg underline">House</h2>
+          <h2 className="text-gray-900 font-bold text-lg ">House</h2>
           <div>
             <label
               htmlFor="house-price"
@@ -250,9 +250,7 @@ export default function House() {
           </div>
         </div>
         <div className="flex flex-col gap-y-2">
-          <h2 className="text-gray-900 font-bold text-lg underline">
-            Mortgage
-          </h2>
+          <h2 className="text-gray-900 font-bold text-lg ">Mortgage</h2>
           <div>
             <label
               htmlFor="term"
@@ -303,7 +301,7 @@ export default function House() {
           </div>
         </div>
       </div>
-      <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-10 sm:rounded-lg max-h-[1000px] h-min overflow-y-scroll w-full">
+      <div className="col-span-9 overflow-hidden shadow ring-1 ring-black ring-opacity-10 sm:rounded-lg max-h-[1000px] h-min overflow-y-scroll w-full">
         <table className="divide-y divide-gray-300 max-h-[1000px] w-full">
           <thead className="bg-gray-100 sticky top-0 z-10">
             <tr>
@@ -414,7 +412,9 @@ export default function House() {
                 </td>
                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
                   <div className="flex gap-x-2 items-end">
-                    <span>{formatValue(result.savings)}</span>
+                    <span className="font-bold">
+                      {formatValue(result.savings)}
+                    </span>
                     <span className="text-xs text-gray-400">
                       {formatValue(result.realTermsSavings)}
                     </span>

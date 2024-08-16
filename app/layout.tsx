@@ -16,7 +16,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <nav className="bg-black flex justify-between text-white px-12 py-4 items-center">
+          <h1 className="text-2xl font-semibold">Financial Calculator</h1>
+          <ul className="flex gap-x-12">
+            <li>Monthly Budget</li>
+            <li>Yearly Savings</li>
+          </ul>
+        </nav>
+        {children}
+      </body>
     </html>
   );
 }
