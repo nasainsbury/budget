@@ -32,11 +32,6 @@ export default function House() {
 
   useEffect(() => {
     setBudget(generateHouseBudget(settings));
-    try {
-      localStorage.setItem("settings", JSON.stringify(settings));
-    } catch (err) {
-      console.log(err);
-    }
   }, [settings]);
 
   const setValue = useCallback(

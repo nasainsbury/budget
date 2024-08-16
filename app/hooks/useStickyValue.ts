@@ -1,9 +1,16 @@
+"use client";
 import React from "react";
 
 function useStickyState<T>(defaultValue: T, key: string) {
   const [value, setValue] = React.useState<T>(() => {
-    const stickyValue = window?.localStorage.getItem(key);
-    return stickyValue !== null ? (JSON.parse(stickyValue) as T) : defaultValue;
+    let value = defaultValue;
+    if (typeof window !== "undefined") {
+      const stickyValue = window?.localStorage.getItem(key);
+      if (stickyValue) {
+        value = JSON.parse(stickyValue) as T;
+      }
+    }
+    return value;
   });
 
   React.useEffect(() => {
