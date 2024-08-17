@@ -153,7 +153,7 @@ function InputForm() {
         </thead>
         <tbody className="divide-y divide-gray-200 bg-white">
           {budget.map((result) => (
-            <Disclosure>
+            <Disclosure key={result.date.toJSDate().toString()}>
               {({ open }) => (
                 <>
                   <DisclosureButton
@@ -200,7 +200,7 @@ function InputForm() {
                         <h2>Income</h2>
                         <ul>
                           {result.income.fields.map((income) => (
-                            <li>
+                            <li key={income.name}>
                               {income.name}: {income.amount}
                             </li>
                           ))}
