@@ -1,8 +1,13 @@
 "use client";
 
 import { generateBudget } from "../utils/generateBudgetOutput";
+import {
+  Disclosure,
+  DisclosureButton,
+  DisclosurePanel,
+} from "@headlessui/react";
+
 import { DateTime } from "luxon";
-import clsx from "classnames";
 
 function formatValue(value: number) {
   return `£${Math.round(value).toLocaleString()}`;
@@ -148,42 +153,67 @@ function InputForm() {
         </thead>
         <tbody className="divide-y divide-gray-200 bg-white">
           {budget.map((result) => (
-            <tr
-              className="even:bg-gray-100 hover:bg-yellow-100"
-              key={result.date.toString()}
-            >
-              <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                <button onClick={() => console.log("cool")}>
-                  {result.date.monthLong} {result.date.year}
-                </button>
-              </td>
-              <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
-                {formatValue(result.income.total)}
-              </td>
-              <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
-                {formatValue(result.expenses.total)}
-              </td>
-              <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
-                <div className="flex gap-x-2 items-end">
-                  <span className="font-bold">
-                    {formatValue(result.debt.total)}
-                  </span>
-                  <span className="text-xs text-gray-400">
-                    {formatValue(result.debt.totalBalance)}
-                  </span>
-                </div>
-              </td>
-              <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
-                <div className="flex gap-x-2 items-end">
-                  <span className="font-bold">
-                    {formatValue(result.savings.total)}
-                  </span>
-                  <span className="text-xs text-gray-400">
-                    {formatValue(result.savings.totalBalance)}
-                  </span>
-                </div>
-              </td>
-            </tr>
+            <Disclosure>
+              {({ open }) => (
+                <>
+                  <DisclosureButton
+                    as="tr"
+                    className="hover:bg-yellow-100 hover:cursor-pointer"
+                    key={result.date.toString()}
+                  >
+                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                      {result.date.monthLong} {result.date.year}
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
+                      {formatValue(result.income.total)}
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
+                      {formatValue(result.expenses.total)}
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
+                      <div className="flex gap-x-2 items-end">
+                        <span className="font-bold">
+                          {formatValue(result.debt.total)}
+                        </span>
+                        <span className="text-xs text-gray-400">
+                          {formatValue(result.debt.totalBalance)}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
+                      <div className="flex gap-x-2 items-end">
+                        <span className="font-bold">
+                          {formatValue(result.savings.total)}
+                        </span>
+                        <span className="text-xs text-gray-400">
+                          {formatValue(result.savings.totalBalance)}
+                        </span>
+                      </div>
+                    </td>
+                  </DisclosureButton>
+                  <tr>
+                    <td
+                      className="px-4 py-4 grid grid-cols-4 justify-between"
+                      colSpan={5}
+                    >
+                      <div className="col-span-1">
+                        <h2>Income</h2>
+                        <ul>
+                          {result.income.fields.map((income) => (
+                            <li>
+                              {income.name}: {income.amount}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div>Expenses</div>
+                      <div>Debts</div>
+                      <div>Debts</div>
+                    </td>
+                  </tr>
+                </>
+              )}
+            </Disclosure>
           ))}
         </tbody>
       </table>

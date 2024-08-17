@@ -17,7 +17,7 @@ export function generateHouseBudget(config: HouseConfig) {
 
   for (
     let elapsedYears = 0;
-    elapsedYears < config.mortgageTerm + 1;
+    elapsedYears < config.mortgageTerm;
     elapsedYears++
   ) {
     const previousYear = budget[elapsedYears - 1];
@@ -44,7 +44,9 @@ export function generateHouseBudget(config: HouseConfig) {
     let remainingBalance = previousBalance;
     let yearlyMorgateInterestPaid = 0;
 
-    for (let month = 1; month < 12; month++) {
+    let totalMorg = monthlyPayment * 12;
+    for (let month = 0; month < 12; month++) {
+      totalMorg -= monthlyPayment;
       // Savings
       const monthlyInterest = savings * (config.savingsInterest / 1200);
       savings += monthlyInterest;
@@ -57,6 +59,8 @@ export function generateHouseBudget(config: HouseConfig) {
       yearlyMorgateInterestPaid += monthlyMortgageInterest;
       remainingBalance += monthlyMortgageInterest;
     }
+
+    console.log(totalMorg);
 
     const period: HousePeriod = {
       year: year + elapsedYears,

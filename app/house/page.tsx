@@ -414,7 +414,18 @@ export default function House() {
                     {formatValue(result.interestPaid)}
                   </td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
-                    {formatValue(result.salary)}
+                    <div className="flex gap-x-2 items-end">
+                      <span className="font-bold">
+                        {formatValue(result.salary)}
+                      </span>
+                      <span className="text-xs text-gray-400">
+                        {formatValue(
+                          result.salary -
+                            result.mortgagePayment -
+                            result.salary * (settings.savingsPercent / 100)
+                        )}
+                      </span>
+                    </div>
                   </td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
                     {formatValue(
