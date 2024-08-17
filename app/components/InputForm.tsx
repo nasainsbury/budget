@@ -66,7 +66,7 @@ function InputForm() {
           increasePerAnnum: 3,
         },
         {
-          amount: 700,
+          amount: 800,
           name: "General",
           increasePerAnnum: 3,
         },
@@ -114,8 +114,8 @@ function InputForm() {
   );
 
   return (
-    <div className="col-span-9 overflow-hidden shadow ring-1 ring-black ring-opacity-10 sm:rounded-lg max-h-[1000px] overflow-y-scroll w-full">
-      <table className="divide-y divide-gray-300 max-h-[1000px] w-full">
+    <div className="col-span-9 overflow-hidden shadow ring-1 ring-black ring-opacity-10 sm:rounded-lg max-h-[500px] overflow-y-scroll w-full">
+      <table className="divide-y divide-gray-300 w-full">
         <thead className="bg-gray-100 sticky top-0 z-10">
           <tr>
             <th
@@ -147,74 +147,84 @@ function InputForm() {
               className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
               scope="col"
             >
+              Remaining Debt
+            </th>
+            <th
+              className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+              scope="col"
+            >
+              Savings
+            </th>
+            <th
+              className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+              scope="col"
+            >
               Total Savings
             </th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200 bg-white">
-          {budget.map((result) => (
-            <Disclosure key={result.date.toJSDate().toString()}>
-              {({ open }) => (
-                <>
-                  <DisclosureButton
-                    as="tr"
-                    className="hover:bg-yellow-100 hover:cursor-pointer"
-                    key={result.date.toString()}
-                  >
-                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                      {result.date.monthLong} {result.date.year}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
-                      {formatValue(result.income.total)}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
-                      {formatValue(result.expenses.total)}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
-                      <div className="flex gap-x-2 items-end">
-                        <span className="font-bold">
-                          {formatValue(result.debt.total)}
-                        </span>
-                        <span className="text-xs text-gray-400">
-                          {formatValue(result.debt.totalBalance)}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
-                      <div className="flex gap-x-2 items-end">
-                        <span className="font-bold">
-                          {formatValue(result.savings.total)}
-                        </span>
-                        <span className="text-xs text-gray-400">
-                          {formatValue(result.savings.totalBalance)}
-                        </span>
-                      </div>
-                    </td>
-                  </DisclosureButton>
-                  <tr>
-                    <td
-                      className="px-4 py-4 grid grid-cols-4 justify-between"
-                      colSpan={5}
-                    >
-                      <div className="col-span-1">
-                        <h2>Income</h2>
-                        <ul>
-                          {result.income.fields.map((income) => (
-                            <li key={income.name}>
-                              {income.name}: {income.amount}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                      <div>Expenses</div>
-                      <div>Debts</div>
-                      <div>Debts</div>
-                    </td>
-                  </tr>
-                </>
-              )}
-            </Disclosure>
-          ))}
+          {budget.map((result) => {
+            const expensePercent = (
+              (result.expenses.total / result.income.total) *
+              100
+            ).toPrecision(3);
+
+            const debtPercent = (
+              (result.debt.total / result.income.total) *
+              100
+            ).toPrecision(3);
+
+            const savingsPercent = (
+              (result.savings.total / result.income.total) *
+              100
+            ).toPrecision(3);
+            return (
+              <tr
+                className="even:bg-gray-100 hover:bg-yellow-100"
+                key={result.date.toFormat("dd-mm-yyyy")}
+              >
+                <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                  {result.date.monthLong} {result.date.year}
+                </td>
+                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
+                  {formatValue(result.income.total)}
+                </td>
+                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
+                  <div className="flex gap-x-2 items-end">
+                    <span>{formatValue(result.expenses.total)}</span>
+                    <span className="text-xs text-gray-400">
+                      {expensePercent}%
+                    </span>
+                  </div>
+                </td>
+                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
+                  <div className="flex flex-col gap-y-1">
+                    <div className="flex gap-x-2 items-end">
+                      <span>{formatValue(result.debt.total)}</span>
+                      <span className="text-xs text-gray-400">
+                        {debtPercent}%
+                      </span>
+                    </div>
+                  </div>
+                </td>
+                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600 font-bold">
+                  {formatValue(result.debt.totalBalance)}
+                </td>
+                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
+                  <div className="flex gap-x-2 items-end">
+                    <span>{formatValue(result.savings.total)}</span>
+                    <span className="text-xs text-gray-400">
+                      {savingsPercent}%
+                    </span>
+                  </div>
+                </td>
+                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600 font-bold">
+                  {formatValue(result.savings.totalBalance)}
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
