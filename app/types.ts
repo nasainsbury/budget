@@ -5,12 +5,23 @@ export type BudgetConfig = {
   expenses: ExpensesConfig[];
   debt: DebtConfig[];
   savings: SavingsConfig[];
+  oneOffs: OneOff[];
   meta: {
     netRemaining: {
       name: string;
       type: "expenses" | "savings";
     };
   };
+};
+
+export type OneOff = {
+  name: string;
+  amount: number;
+  date: {
+    month: number;
+    year: number;
+  };
+  type: "income" | "expense";
 };
 
 export type CommonConfig = {

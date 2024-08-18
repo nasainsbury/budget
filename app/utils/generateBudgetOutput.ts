@@ -8,10 +8,13 @@ export function generateBudget(
 ): BudgetPeriod[] {
   const periods: BudgetPeriod[] = [];
   let date = startingDate;
+  let yearsPassed = 0;
 
   for (let month = 0; month < months; month++) {
+    if (date.get("month") === 1) {
+      yearsPassed++;
+    }
     const previousMonth = periods[month - 1] ?? null;
-    const shouldIncrease = date.get("month") === 1;
 
     const budgetPeriod: BudgetPeriod = {
       date,
@@ -36,126 +39,102 @@ export function generateBudget(
     };
 
     // Calculate income
-    config.income.forEach((income, index) => {
-      const increasePerAnnum = income.increasePerAnnum / 100;
+    config.income.forEach((income) => {
+      const increasePerAnnum = 1 + income.increasePerAnnum / 100;
+      const amount = income.amount * Math.pow(increasePerAnnum, yearsPassed);
 
-      const field = {
+      budgetPeriod.income.fields.push({
         name: income.name,
-        amount: 0,
-        increase: 0,
-      };
+        amount,
+      });
 
-      if (previousMonth) {
-        field.amount = previousMonth.income.fields[index].amount;
-      } else {
-        field.amount = income.amount;
-      }
-
-      if (shouldIncrease) {
-        field.amount = field.amount * (1 + increasePerAnnum);
-      }
-
-      budgetPeriod.income.total += field.amount;
-      budgetPeriod.income.fields.push(field);
+      budgetPeriod.income.total += amount;
     });
 
     // Calculate expenses
-    config.expenses.forEach((expense, index) => {
-      const increasePerAnnum = expense.increasePerAnnum / 100;
+    config.expenses.forEach((expense) => {
+      const increasePerAnnum = 1 + expense.increasePerAnnum / 100;
+      const amount = expense.amount * Math.pow(increasePerAnnum, yearsPassed);
 
-      const field = {
+      budgetPeriod.income.fields.push({
         name: expense.name,
-        amount: 0,
-        increase: 0,
-      };
+        amount,
+      });
 
-      if (previousMonth) {
-        field.amount = previousMonth.expenses.fields[index].amount;
-      } else {
-        field.amount = expense.amount;
-      }
-
-      if (shouldIncrease) {
-        field.amount = field.amount * (1 + increasePerAnnum);
-      }
-
-      budgetPeriod.expenses.total += field.amount;
-      budgetPeriod.expenses.fields.push(field);
+      budgetPeriod.expenses.total += amount;
     });
 
     // Calculate debt
     config.debt.forEach((debt, index) => {
-      const increasePerAnnum = debt.increasePerAnnum / 100;
+      const increasePerAnnum = 1 + debt.increasePerAnnum / 100;
+      let balance = previousMonth
+        ? previousMonth.debt.fields[index].balance
+        : debt.startingBalance;
+      let amount = debt.amount * Math.pow(increasePerAnnum, yearsPassed);
 
-      const field = {
+      if (amount >= balance) {
+        amount = balance;
+        balance = 0;
+      } else {
+        balance -= amount;
+      }
+
+      budgetPeriod.debt.fields.push({
+        amount,
+        balance,
         name: debt.name,
-        amount: 0,
-        balance: 0,
-      };
+      });
 
-      if (previousMonth) {
-        field.amount = previousMonth.debt.fields[index].amount;
-        field.balance = previousMonth.debt.fields[index].balance;
-      } else {
-        field.amount = debt.amount;
-        field.balance = debt.startingBalance;
-      }
-
-      if (shouldIncrease) {
-        field.amount = field.amount * (1 + increasePerAnnum);
-      }
-
-      if (field.amount >= field.balance) {
-        field.amount = field.balance;
-        field.balance = 0;
-      } else {
-        field.balance -= field.amount;
-      }
-
-      budgetPeriod.debt.total += field.amount;
-      budgetPeriod.debt.totalBalance += field.balance;
-      budgetPeriod.debt.fields.push(field);
+      budgetPeriod.debt.totalBalance += balance;
+      budgetPeriod.debt.total += amount;
     });
 
     // Calculate savings
     config.savings.forEach((savings, index) => {
-      const increasePerAnnum = savings.increasePerAnnum / 100;
+      const increasePerAnnum = 1 + savings.increasePerAnnum / 100;
+      let balance = previousMonth
+        ? previousMonth.savings.fields[index].balance
+        : savings.startingBalance;
+      let amount = savings.amount * Math.pow(increasePerAnnum, yearsPassed);
+
       const interestRate = savings.annualInterest / 100;
 
-      const field = {
+      if (savings.interestPaid === "yearly" && date.get("month") === 1) {
+        balance *= 1 + interestRate;
+      } else if (savings.interestPaid === "monthly") {
+        balance *= 1 + interestRate / 12;
+      }
+
+      balance += amount;
+
+      budgetPeriod.savings.fields.push({
         name: savings.name,
-        amount: 0,
-        balance: 0,
-        interest: 0,
-      };
+        amount: amount,
+        balance: balance,
+      });
 
-      // set defaults
-      if (previousMonth) {
-        field.amount = previousMonth.savings.fields[index].amount;
-        field.balance = previousMonth.savings.fields[index].balance;
-      } else {
-        field.amount = savings.amount;
-        field.balance = savings.startingBalance;
-      }
+      budgetPeriod.savings.total += amount;
+      budgetPeriod.savings.totalBalance += balance;
+    });
 
-      if (shouldIncrease) {
-        field.amount = field.amount * (1 + increasePerAnnum);
-      }
-
-      if (savings.interestPaid === "yearly") {
-        if (shouldIncrease) {
-          field.interest = field.balance * interestRate;
+    config.oneOffs.forEach((oneOff) => {
+      if (oneOff.date.month === date.month && oneOff.date.year === date.year) {
+        if (oneOff.type === "expense") {
+          budgetPeriod.expenses.total += oneOff.amount;
+          budgetPeriod.expenses.fields.push({
+            amount: oneOff.amount,
+            name: oneOff.name,
+          });
         }
-      } else {
-        // "monthly"
-        field.interest = field.balance * (interestRate / 12);
+
+        if (oneOff.type === "income") {
+          budgetPeriod.income.total += oneOff.amount;
+          budgetPeriod.income.fields.push({
+            amount: oneOff.amount,
+            name: oneOff.name,
+          });
+        }
       }
-
-      field.balance += field.amount + field.interest;
-
-      budgetPeriod.savings.total += field.amount;
-      budgetPeriod.savings.totalBalance += field.balance;
-      budgetPeriod.savings.fields.push(field);
     });
 
     const net =
@@ -167,23 +146,18 @@ export function generateBudget(
     const netName = config.meta.netRemaining.name;
 
     if (config.meta.netRemaining.type === "savings") {
-      let found = false;
-
       budgetPeriod.savings.fields.forEach((field, index) => {
         if (field.name === netName) {
           budgetPeriod.savings.fields[index].amount += net;
           budgetPeriod.savings.fields[index].balance += net;
-          found = true;
+          budgetPeriod.savings.total += net;
+          budgetPeriod.savings.totalBalance += net;
         }
       });
-
-      if (found) {
-        budgetPeriod.savings.total += net;
-      }
     }
 
     // Incremement the month
-    date = startingDate.set({ month: date.month + 1 });
+    date = date.set({ month: date.month + 1 });
 
     periods.push(budgetPeriod);
   }

@@ -1,13 +1,8 @@
 "use client";
 
 import { generateBudget } from "../utils/generateBudgetOutput";
-import {
-  Disclosure,
-  DisclosureButton,
-  DisclosurePanel,
-} from "@headlessui/react";
 
-import { DateTime } from "luxon";
+import { DateTime, Duration } from "luxon";
 
 function formatValue(value: number) {
   return `£${Math.round(value).toLocaleString()}`;
@@ -16,6 +11,62 @@ function formatValue(value: number) {
 function InputForm() {
   const budget = generateBudget(
     {
+      oneOffs: [
+        {
+          amount: 2000,
+          name: "Bonus",
+          type: "income",
+          date: {
+            month: 12,
+            year: 2024,
+          },
+        },
+        {
+          amount: 260,
+          name: "Pokemon cards",
+          type: "income",
+          date: {
+            month: 8,
+            year: 2024,
+          },
+        },
+        {
+          amount: 725,
+          name: "Dentist",
+          type: "expense",
+          date: {
+            month: 8,
+            year: 2024,
+          },
+        },
+        {
+          amount: 520,
+          name: "Car",
+          type: "expense",
+          date: {
+            month: 8,
+            year: 2024,
+          },
+        },
+        {
+          amount: 400,
+          name: "Willow's Present",
+          type: "expense",
+          date: {
+            month: 10,
+            year: 2024,
+          },
+        },
+        {
+          amount: 400,
+          name: "Christmas",
+          type: "expense",
+          date: {
+            month: 12,
+            year: 2024,
+          },
+        },
+      ],
       meta: {
         netRemaining: {
           name: "ISA",
@@ -51,7 +102,7 @@ function InputForm() {
           increasePerAnnum: 3,
         },
         {
-          amount: 100,
+          amount: 110,
           name: "Energy",
           increasePerAnnum: 3,
         },
@@ -61,7 +112,7 @@ function InputForm() {
           increasePerAnnum: -20,
         },
         {
-          amount: 30,
+          amount: 50,
           name: "Subscriptions",
           increasePerAnnum: 3,
         },
@@ -78,7 +129,7 @@ function InputForm() {
       ],
       debt: [
         {
-          amount: 450,
+          amount: 500,
           increasePerAnnum: 0,
           name: "Monzo Loan",
           startingBalance: 6750,
@@ -92,7 +143,7 @@ function InputForm() {
       ],
       savings: [
         {
-          amount: 500,
+          amount: 300,
           annualInterest: 9,
           increasePerAnnum: 5,
           interestPaid: "monthly",
@@ -100,12 +151,12 @@ function InputForm() {
           startingBalance: 300,
         },
         {
-          amount: 500,
+          amount: 0,
           annualInterest: 4.4,
           increasePerAnnum: 5,
           interestPaid: "monthly",
           name: "Pot",
-          startingBalance: 10800,
+          startingBalance: 10480,
         },
       ],
     },
