@@ -77,9 +77,12 @@ function MonthlyBudgetTable(props: MonthlyBudgetTableProps) {
               100
             ).toPrecision(3);
             return (
-              <tr className="even:bg-gray-100 hover:bg-yellow-100" key={"as"}>
+              <tr
+                className="even:bg-gray-100 hover:bg-yellow-100"
+                key={result.date.toString()}
+              >
                 <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                  -
+                  {result.date.toFormat("LLL yyyy")}
                 </td>
                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
                   {formatValue(result.income.total)}
