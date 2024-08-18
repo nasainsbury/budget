@@ -1,8 +1,34 @@
+"use client";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
 
-import InputForm from "./components/InputForm";
+import MonthlyBudgetTable from "./components/MonthlyBudgetTable";
+import { DateTime } from "luxon";
+import { generateBudget } from "./utils/generateBudgetOutput";
+import MonthlyBudgetForm from "./components/MonthlyBudgetForm";
+import { useEffect, useState } from "react";
+import { BudgetConfig, BudgetPeriod } from "./types";
 
 export default function Home() {
+  const [config, setConfig] = useState<BudgetConfig>({
+    oneOffs: [],
+    meta: {
+      netRemaining: {
+        name: "pot",
+        type: "savings",
+      },
+    },
+    income: [],
+    expenses: [],
+    debt: [],
+    savings: [],
+  });
+
+  const [budget, setBudget] = useState<BudgetPeriod[]>([]);
+
+  useEffect(() => {
+    setBudget(generateBudget(config, DateTime.now(), 24));
+  }, [config]);
+
   return (
     <main className="px-12 py-4">
       <TabGroup className="flex flex-col gap-y-4">
@@ -15,9 +41,11 @@ export default function Home() {
           </Tab>
         </TabList>
         <TabPanels>
-          <TabPanel>Budget</TabPanel>
           <TabPanel>
-            <InputForm />
+            <MonthlyBudgetForm onChange={setConfig} />
+          </TabPanel>
+          <TabPanel>
+            <MonthlyBudgetTable budget={budget} />
           </TabPanel>
         </TabPanels>
       </TabGroup>
