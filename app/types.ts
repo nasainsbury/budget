@@ -40,7 +40,7 @@ export type DebtConfig = {
 export type SavingsConfig = {
   startingBalance: number;
   annualInterest: number;
-  interestPaid: "yearly" | "monthly";
+  interestPaid: string;
 } & CommonConfig;
 
 /* BudgetOutput */

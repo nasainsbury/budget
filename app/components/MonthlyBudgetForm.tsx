@@ -127,6 +127,34 @@ function MonthlyBudgetForm(props: MonthlyBudgetFormProps) {
           return { ...config, expenses: updatedExpense };
         });
       }
+
+      if (type === "debt") {
+        setConfig((config) => {
+          const updatedDebt = [
+            ...config.debt,
+            { name: "", amount: 0, increasePerAnnum: 0, startingBalance: 0 },
+          ];
+          return { ...config, debt: updatedDebt };
+        });
+      }
+
+      if (type === "savings") {
+        setConfig((config) => {
+          const updatedSavings = [
+            ...config.savings,
+            {
+              name: "",
+              amount: 0,
+              annualInterest: 0,
+              increasePerAnnum: 0,
+              interestPaid: "monthly",
+              startingBalance: 0,
+            },
+          ];
+
+          return { ...config, savings: updatedSavings };
+        });
+      }
     },
     []
   );
@@ -208,7 +236,7 @@ function MonthlyBudgetForm(props: MonthlyBudgetFormProps) {
           <tbody>
             {config.expenses.map((expense, index) => (
               <MonthlyIncome
-                key={expense.name}
+                key={index}
                 name={expense.name}
                 amount={expense.amount}
                 type="expenses"
@@ -423,7 +451,7 @@ type SavingsProps = {
   amount: number;
   increasePerAnnum: number;
   annualInterest: number;
-  interestPaid: "monthly" | "yearly";
+  interestPaid: string;
   startingBalance: number;
   onChange: (key: string, value: string | number) => void;
   onDelete: () => void;
