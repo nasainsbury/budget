@@ -18,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <nav className="bg-black flex justify-between text-white px-12 py-4 items-center">
+        {/* <nav className="bg-black flex justify-between text-white px-12 py-4 items-center">
           <h1 className="text-2xl font-semibold">Financial Calculator</h1>
           <ul className="flex gap-x-12">
             <li>
@@ -28,7 +28,7 @@ export default function RootLayout({
               <Link href="/house">Yearly Budget</Link>
             </li>
           </ul>
-        </nav>
+        </nav> */}
         {children}
       </body>
     </html>
