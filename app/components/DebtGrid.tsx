@@ -4,19 +4,20 @@ import Trash from "../icons/Trash";
 import { useFinanceStore } from "../store/useBudgetStore";
 
 function DebtGrid() {
-  const { debt } = useFinanceStore();
+  const { debt, deleteDebt } = useFinanceStore();
 
   return (
     <div className="flex flex-col gap-y-6 border border-stone-500 bg-[#18181b] px-6 py-4 rounded">
       <h2 className="text-lg font-bold font-sans text-stone-200">Debts</h2>
       <ul className="flex flex-col gap-y-4">
-        {debt.map((d) => (
-          <li>
+        {debt.map((d, index) => (
+          <li key={d.name}>
             <DebtGridRow
               name={d.name}
               amount={d.amount}
               balance={d.startingBalance}
               yearlyIncrease={d.increasePerAnnum}
+              onDelete={() => deleteDebt(index)}
             />
           </li>
         ))}
@@ -33,6 +34,7 @@ type DebtGridRowProps = {
   amount: number;
   balance: number;
   yearlyIncrease: number;
+  onDelete: () => void;
 };
 
 function DebtGridRow(props: DebtGridRowProps) {
@@ -53,7 +55,7 @@ function DebtGridRow(props: DebtGridRowProps) {
           <Edit className="text-stone-200" />
         </button>
         <button>
-          <Trash className="text-stone-200" />
+          <Trash className="text-stone-200" onClick={props.onDelete} />
         </button>
       </div>
     </div>

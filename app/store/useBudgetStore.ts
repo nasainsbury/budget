@@ -15,6 +15,18 @@ type BudgetStore = {
   addIncome: (income: IncomeConfig) => void;
   editIncome: (index: number, updatedIncome: IncomeConfig) => void;
   deleteIncome: (index: number) => void;
+
+  addExpense: (income: ExpensesConfig) => void;
+  editExpense: (index: number, updatedExpense: ExpensesConfig) => void;
+  deleteExpense: (index: number) => void;
+
+  addDebt: (income: DebtConfig) => void;
+  editDebt: (index: number, updatedDebt: DebtConfig) => void;
+  deleteDebt: (index: number) => void;
+
+  addSavings: (income: SavingsConfig) => void;
+  editSavings: (index: number, updatedSavings: SavingsConfig) => void;
+  deleteSavings: (index: number) => void;
 };
 
 export const useFinanceStore = create<BudgetStore>((set) => ({
@@ -118,5 +130,43 @@ export const useFinanceStore = create<BudgetStore>((set) => ({
   deleteIncome: (index) =>
     set((state) => ({
       income: state.income.filter((_, i) => i !== index),
+    })),
+
+  addExpense: (newExpense) =>
+    set((state) => ({ expenses: [...state.expenses, newExpense] })),
+  editExpense: (index, updatedExpense) =>
+    set((state) => {
+      const updatedExpenses = [...state.expenses];
+      updatedExpenses[index] = updatedExpense;
+      return { expenses: updatedExpenses };
+    }),
+  deleteExpense: (index) =>
+    set((state) => ({
+      expenses: state.expenses.filter((_, i) => i !== index),
+    })),
+
+  addDebt: (newDebt) => set((state) => ({ debt: [...state.debt, newDebt] })),
+  editDebt: (index, updatedDebt) =>
+    set((state) => {
+      const updatedDebts = [...state.debt];
+      updatedDebts[index] = updatedDebt;
+      return { debt: updatedDebts };
+    }),
+  deleteDebt: (index) =>
+    set((state) => ({
+      debt: state.debt.filter((_, i) => i !== index),
+    })),
+
+  addSavings: (newSavings) =>
+    set((state) => ({ savings: [...state.savings, newSavings] })),
+  editSavings: (index, updatedSaving) =>
+    set((state) => {
+      const updatedSavings = [...state.savings];
+      updatedSavings[index] = updatedSaving;
+      return { savings: updatedSavings };
+    }),
+  deleteSavings: (index) =>
+    set((state) => ({
+      savings: state.savings.filter((_, i) => i !== index),
     })),
 }));

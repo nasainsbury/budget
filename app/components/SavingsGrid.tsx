@@ -4,15 +4,16 @@ import Trash from "../icons/Trash";
 import { useFinanceStore } from "../store/useBudgetStore";
 
 function SavingsGrid() {
-  const { savings } = useFinanceStore();
+  const { savings, deleteSavings } = useFinanceStore();
 
   return (
     <div className="flex flex-col gap-y-6 border border-stone-500 bg-[#18181b] px-6 py-4 rounded">
       <h2 className="text-lg font-bold font-sans text-stone-200">Savings</h2>
       <ul className="flex flex-col gap-y-4">
-        {savings.map((s) => (
-          <li>
+        {savings.map((s, index) => (
+          <li key={s.name}>
             <SavingsGridRow
+              onDelete={() => deleteSavings(index)}
               name={s.name}
               amount={s.amount}
               balance={s.startingBalance}
@@ -37,6 +38,7 @@ type SavingsGridRowProps = {
   yearlyIncrease: number;
   yearlyInterest: number;
   interestPaid: string;
+  onDelete: () => void;
 };
 
 function SavingsGridRow(props: SavingsGridRowProps) {
@@ -60,7 +62,7 @@ function SavingsGridRow(props: SavingsGridRowProps) {
           <Edit className="text-stone-200" />
         </button>
         <button>
-          <Trash className="text-stone-200" />
+          <Trash className="text-stone-200" onClick={props.onDelete} />
         </button>
       </div>
     </div>

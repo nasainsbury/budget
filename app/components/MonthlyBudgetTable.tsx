@@ -1,6 +1,9 @@
 "use client";
 
+import { DateTime } from "luxon";
+import { useFinanceStore } from "../store/useBudgetStore";
 import { BudgetPeriod } from "../types";
+import { generateBudget } from "../utils/generateBudgetOutput";
 
 function formatValue(value: number) {
   return `£${Math.round(value).toLocaleString()}`;
@@ -9,11 +12,30 @@ function formatValue(value: number) {
 type MonthlyBudgetTableProps = {
   budget?: BudgetPeriod[];
 };
-function MonthlyBudgetTable(props: MonthlyBudgetTableProps) {
+function MonthlyBudgetTable() {
+  const { income, savings, debt, expenses } = useFinanceStore();
+
+  const budget = generateBudget(
+    {
+      debt,
+      expenses,
+      income,
+      oneOffs: [],
+      meta: {
+        netRemaining: {
+          name: "ISA",
+          type: "savings",
+        },
+      },
+      savings,
+    },
+    DateTime.now(),
+    20
+  );
   return (
     <div className="col-span-9 overflow-hidden shadow ring-1 ring-black ring-opacity-10 sm:rounded-lg max-h-[500px] overflow-y-scroll w-full">
-      <table className="divide-y divide-gray-300 w-full">
-        <thead className="bg-gray-100 sticky top-0 z-10">
+      <table className="divide-y divide-stone-3s00 w-full">
+        <thead className="sticky top-0 z-10">
           <tr>
             <th
               className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
@@ -60,8 +82,8 @@ function MonthlyBudgetTable(props: MonthlyBudgetTableProps) {
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200 bg-white">
-          {props.budget?.map((result) => {
+        <tbody className="divide-y divide-gray-200">
+          {budget.map((result) => {
             const expensePercent = (
               (result.expenses.total / result.income.total) *
               100
@@ -77,10 +99,7 @@ function MonthlyBudgetTable(props: MonthlyBudgetTableProps) {
               100
             ).toPrecision(3);
             return (
-              <tr
-                className="even:bg-gray-100 hover:bg-yellow-100"
-                key={result.date.toString()}
-              >
+              <tr className="hover:bg-stone-500" key={result.date.toString()}>
                 <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
                   {result.date.toFormat("LLL yyyy")}
                 </td>

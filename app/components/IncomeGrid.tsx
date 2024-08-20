@@ -11,7 +11,7 @@ function IncomeGrid() {
       <h2 className="text-lg font-bold font-sans text-stone-200">Income</h2>
       <ul className="flex flex-col gap-y-4">
         {income.map((inc, index) => (
-          <li>
+          <li key={inc.name}>
             <IncomeGridRow
               name={inc.name}
               amount={inc.amount}

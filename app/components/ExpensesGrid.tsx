@@ -4,18 +4,19 @@ import Trash from "../icons/Trash";
 import { useFinanceStore } from "../store/useBudgetStore";
 
 function ExpensesGrid() {
-  const { expenses } = useFinanceStore();
+  const { expenses, deleteExpense, addExpense } = useFinanceStore();
 
   return (
     <div className="flex flex-col gap-y-6 border border-stone-500 bg-[#18181b] px-6 py-4 rounded">
       <h2 className="text-lg font-bold font-sans text-stone-200">Expenses</h2>
       <ul className="flex flex-col gap-y-4">
-        {expenses.map((expense) => (
-          <li>
+        {expenses.map((expense, index) => (
+          <li key={expense.name}>
             <ExpensesGridRow
               name={expense.name}
               amount={expense.amount}
               yearlyIncrease={expense.increasePerAnnum}
+              onDelete={() => deleteExpense(index)}
             />
           </li>
         ))}
@@ -31,6 +32,7 @@ type ExpensesGridRowProps = {
   name: string;
   amount: number;
   yearlyIncrease: number;
+  onDelete: () => void;
 };
 
 function ExpensesGridRow(props: ExpensesGridRowProps) {
@@ -48,7 +50,7 @@ function ExpensesGridRow(props: ExpensesGridRowProps) {
           <Edit className="text-stone-200" />
         </button>
         <button>
-          <Trash className="text-stone-200" />
+          <Trash className="text-stone-200" onClick={props.onDelete} />
         </button>
       </div>
     </div>
