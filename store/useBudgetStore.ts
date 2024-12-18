@@ -1,10 +1,10 @@
-import create from "zustand";
+import { create } from "zustand";
 import {
   DebtConfig,
   ExpensesConfig,
   IncomeConfig,
   SavingsConfig,
-} from "../types";
+} from "../app/types";
 
 type BudgetStore = {
   income: IncomeConfig[];
@@ -53,16 +53,9 @@ export const useFinanceStore = create<BudgetStore>((set) => ({
   ],
   expenses: [
     {
-      amount: 1250,
+      amount: 600,
       name: "Rent",
       increasePerAnnum: 2,
-      startingBalance: 3005,
-    },
-    {
-      amount: 150,
-      name: "Parking",
-      increasePerAnnum: 0,
-      startingBalance: 1048,
     },
     {
       amount: 110,

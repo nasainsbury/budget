@@ -1,36 +1,35 @@
-import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
-import DebtGrid from "../components/DebtGrid";
-import ExpensesGrid from "../components/ExpensesGrid";
-import IncomeGrid from "../components/IncomeGrid";
-import SavingsGrid from "../components/SavingsGrid";
-import MonthlyBudgetTable from "../components/MonthlyBudgetTable";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Income from "@/components/Income/Income";
 
 function NewPage() {
   return (
-    <main className="px-12 py-4">
-      <TabGroup className="flex flex-col gap-y-4">
-        <TabList className="gap-x-4 flex">
-          <Tab className="rounded-md px-3 py-2 font-medium text-stone-200">
-            Budget
-          </Tab>
-          <Tab className="rounded-md px-3 py-2 font-medium text-stone-200">
-            Results
-          </Tab>
-        </TabList>
-        <TabPanels>
-          <TabPanel>
-            <div className="grid grid-cols-4 gap-x-12">
-              <IncomeGrid />
-              <ExpensesGrid />
-              <DebtGrid />
-              <SavingsGrid />
-            </div>
-          </TabPanel>
-          <TabPanel>
-            <MonthlyBudgetTable />
-          </TabPanel>
-        </TabPanels>
-      </TabGroup>
+    <main className="px-12 py-4 mx-auto">
+      <Tabs defaultValue="income" className="mx-auto w-[600px]">
+        <TabsList>
+          <TabsTrigger value="income" className="px-6">
+            Income
+          </TabsTrigger>
+          <TabsTrigger value="expenses" className="px-6">
+            Expenses
+          </TabsTrigger>
+          <TabsTrigger value="mortgage" className="px-6">
+            Mortgage
+          </TabsTrigger>
+          <TabsTrigger value="debts" className="px-6">
+            Debts
+          </TabsTrigger>
+          <TabsTrigger value="savings" className="px-6">
+            Savings
+          </TabsTrigger>
+          <TabsTrigger value="pension" className="px-6">
+            Pension
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="income">
+          <Income />
+        </TabsContent>
+        <TabsContent value="password"></TabsContent>
+      </Tabs>
     </main>
   );
 }
